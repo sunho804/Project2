@@ -10,7 +10,7 @@ namespace CardLibrary
     public interface IShoe
     {
         void Shuffle();
-        Card Draw();
+        string Draw();
         int NumCards { get; }
     }
     public class Shoe : IDisposable, IShoe
@@ -18,34 +18,43 @@ namespace CardLibrary
         //private attributes
         private List<Card> cards = null;
         private int cardIdx;
-        private StreamWriter log = null;
+        private static uint objCount = 0;
+        private uint objNum;
+        //private StreamWriter log = null;
 
         public Shoe()
         {
-            log = new StreamWriter("shoe.log");
-            logEvent("Creating the Shoe");
+            //log = new StreamWriter("shoe.log");
+            //logEvent("Creating the Shoe");
 
+            objNum = ++objCount;
             cards = new List<Card>();
             repopulate();
         }
 
         public void Shuffle()
         {
-            logEvent("Shuffling the Shoe");
+            //logEvent("Shuffling the Shoe");
 
             Random rng = new Random();
             cards = cards.OrderBy(card => rng.Next()).ToList();
             cardIdx = 0;
         }
 
-        public Card Draw()
+        public string Draw()
         {
+            //if (cardIdx >= cards.Count())
+            //    throw new IndexOutOfRangeException("The shoe is empty.");
+
+            ////logEvent($"Dealing: {cards[cardIdx].ToString()}");
+
+            //return cards[cardIdx++];
             if (cardIdx >= cards.Count())
                 throw new IndexOutOfRangeException("The shoe is empty.");
 
-            //logEvent($"Dealing: {cards[cardIdx].ToString()}");
+            Console.WriteLine($"Shoe object #{objNum} Dealing {cards[cardIdx].ToString()}");
 
-            return cards[cardIdx++];
+            return cards[cardIdx++].ToString();
         }
 
         public int NumCards
@@ -62,7 +71,20 @@ namespace CardLibrary
 
         private void repopulate()
         {
-            logEvent($"Repopulating the Shoe with 1 deck");
+            ////logEvent($"Repopulating the Shoe with 1 deck");
+
+            //// Clear out the "old" cards
+            //cards.Clear();
+
+            //// Add new "new" cards
+            //foreach (Card.SuitID s in Enum.GetValues(typeof(Card.SuitID)))
+            //{
+            //    foreach (Card.RankID r in Enum.GetValues(typeof(Card.RankID)))
+            //    {
+            //        cards.Add(new Card(s, r));
+            //    }
+            //}
+            Console.WriteLine($"Shoe object #{objNum}");
 
             // Clear out the "old" cards
             cards.Clear();
@@ -80,10 +102,10 @@ namespace CardLibrary
             Shuffle();
         }
 
-        private void logEvent(string msg)
-        {
-            log.WriteLine(msg);
-        }
+        //private void logEvent(string msg)
+        //{
+        //    log.WriteLine(msg);
+        //}
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
@@ -95,7 +117,7 @@ namespace CardLibrary
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects).
-                    log.Dispose();
+                    //log.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
