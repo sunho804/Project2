@@ -1,0 +1,28 @@
+﻿<Window x:Class="GoFishClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GoFishClient"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Label Content="Name:" HorizontalAlignment="Left" Margin="16,14,0,0" VerticalAlignment="Top" Height="23" Width="52" Name="nameLabel"/>
+        <TextBox HorizontalAlignment="Left" Height="19" Margin="73,18,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="239" Name="nameTxtBox" />
+        <Button Content="Set" HorizontalAlignment="Left" Margin="333,17,0,0" VerticalAlignment="Top" Width="53" Name="nameSetBtn" Click="nameSetBtn_Click"/>
+        <ListBox HorizontalAlignment="Left" Height="169" Margin="27,55,0,0" VerticalAlignment="Top" Width="440" Name="cardListBox"/>
+        <ListBox HorizontalAlignment="Left" Height="126" Margin="27,263,0,0" VerticalAlignment="Top" Width="661" Name="boardListBox"/>
+        <Label Content="Board" HorizontalAlignment="Left" Margin="27,232,0,0" VerticalAlignment="Top" Width="107" Name="boardLabel"/>
+        <Label Content="Players" HorizontalAlignment="Left" Margin="492,11,0,0" VerticalAlignment="Top" Name="playersLabel"/>
+        <ListBox HorizontalAlignment="Left" Height="56" Margin="492,37,0,0" VerticalAlignment="Top" Width="271" Name="playersListBox"/>
+        <Button Content="ASK" HorizontalAlignment="Left" Margin="492,108,0,0" VerticalAlignment="Top" Width="60" Name="AskBtn" Height="22"/>
+        <ComboBox HorizontalAlignment="Left" Margin="568,108,0,0" VerticalAlignment="Top" Width="120" Name="playersAskComboBox"/>
+        <ComboBox HorizontalAlignment="Left" Margin="704,108,0,0" VerticalAlignment="Top" Width="59" Name="cardsAskComboBox"/>
+        <Button Content="Go Fish! Draw" HorizontalAlignment="Left" Margin="492,144,0,0" VerticalAlignment="Top" Width="271" Name="drawBtn" Click="drawBtn_Click"/>
+        <Label Content="Books I have" HorizontalAlignment="Left" Margin="492,173,0,0" VerticalAlignment="Top" Width="165" Name="bookLable"/>
+        <ListBox HorizontalAlignment="Left" Height="43" Margin="492,204,0,0" VerticalAlignment="Top" Width="271" Name="bookListBox"/>
+        <Button Content="Play" HorizontalAlignment="Left" Margin="409,18,0,0" VerticalAlignment="Top" Width="54" Name="playBtn" Click="playBtn_Click"/>
+        <Button Content="Close" HorizontalAlignment="Left" Margin="704,368,0,0" VerticalAlignment="Top" Width="59" Name="closeBtn" Click="closeBtn_Click"/>
+
+    </Grid>
+</Window>
