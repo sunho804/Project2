@@ -14,14 +14,16 @@ namespace CardLibrary
         [OperationContract(IsOneWay = true)] void UpdateGui(CallBackInfo info);
     }
 
-    [ServiceContract]
+    [ServiceContract(CallbackContract = typeof(ICallback))]
     public interface IShoe
     {
-        [OperationContract]
+        [OperationContract(IsOneWay = true)]
         void Shuffle();
         [OperationContract]
         Card Draw();
         int NumCards { [OperationContract] get; }
+
+      //  [OperationContract] bool ToggleCallbacks();
     }
 
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
@@ -31,6 +33,8 @@ namespace CardLibrary
         private List<Card> cards = null;
         private int cardIdx;
         private StreamWriter log = null;
+
+        private HashSet<ICallback> callbacks = null;
 
         public Shoe()
         {
@@ -48,6 +52,8 @@ namespace CardLibrary
             Random rng = new Random();
             cards = cards.OrderBy(card => rng.Next()).ToList();
             cardIdx = 0;
+
+            updateAllClients(true);
         }
 
         public Card Draw()
@@ -56,8 +62,11 @@ namespace CardLibrary
                 throw new IndexOutOfRangeException("The shoe is empty.");
 
             //logEvent($"Dealing: {cards[cardIdx].ToString()}");
+            Card card = cards[cardIdx++];
 
-            return cards[cardIdx++];
+            updateAllClients(false);
+
+            return card;
         }
 
         public int NumCards
@@ -132,6 +141,30 @@ namespace CardLibrary
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
         }
+
+        public bool ToggleCallbacks()
+        {
+            ICallback cb = OperationContext.Current.GetCallbackChannel<ICallback>();
+
+            if (callbacks.Contains(cb))
+            {
+                callbacks.Remove(cb);
+                return false;
+            }
+            else
+            {
+                callbacks.Add(cb);
+                return true;
+            }
+        }
+        private void updateAllClients(bool emptyHand)
+        {
+            CallBackInfo info = new CallBackInfo(NumCards, emptyHand);
+
+            //foreach (ICallback cb in callbacks)
+            //    cb.UpdateGui(info);
+        }
+
         #endregion
 
     }
