@@ -23,7 +23,7 @@ namespace CardLibrary
         Card Draw();
         int NumCards { [OperationContract] get; }
 
-      //  [OperationContract] bool ToggleCallbacks();
+        [OperationContract] bool ToggleCallbacks();
     }
 
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
@@ -34,7 +34,7 @@ namespace CardLibrary
         private int cardIdx;
         private StreamWriter log = null;
 
-        private HashSet<ICallback> callbacks = null;
+        private HashSet<ICallback> callbacks = new HashSet<ICallback>();
 
         public Shoe()
         {
@@ -161,8 +161,8 @@ namespace CardLibrary
         {
             CallBackInfo info = new CallBackInfo(NumCards, emptyHand);
 
-            //foreach (ICallback cb in callbacks)
-            //    cb.UpdateGui(info);
+            foreach (ICallback cb in callbacks)
+                cb.UpdateGui(info);
         }
 
         #endregion

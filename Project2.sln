@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardLibrary", "CardLibrary\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardServiceHost", "CardServiceHost\CardServiceHost.csproj", "{78569790-7982-4025-86B7-541812BFFE56}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoFishClient", "GoFishClient\GoFishClient.csproj", "{5940E115-9747-4D20-B06B-A19DAC98E44F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{78569790-7982-4025-86B7-541812BFFE56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78569790-7982-4025-86B7-541812BFFE56}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78569790-7982-4025-86B7-541812BFFE56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5940E115-9747-4D20-B06B-A19DAC98E44F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5940E115-9747-4D20-B06B-A19DAC98E44F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5940E115-9747-4D20-B06B-A19DAC98E44F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5940E115-9747-4D20-B06B-A19DAC98E44F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
