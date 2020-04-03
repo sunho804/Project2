@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardLibrary", "CardLibrary\CardLibrary.csproj", "{02C4550E-CFC8-4157-BD33-56ACA38D0D1A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardServiceHost", "CardServiceHost\CardServiceHost.csproj", "{78569790-7982-4025-86B7-541812BFFE56}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{02C4550E-CFC8-4157-BD33-56ACA38D0D1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02C4550E-CFC8-4157-BD33-56ACA38D0D1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02C4550E-CFC8-4157-BD33-56ACA38D0D1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02C4550E-CFC8-4157-BD33-56ACA38D0D1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78569790-7982-4025-86B7-541812BFFE56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78569790-7982-4025-86B7-541812BFFE56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78569790-7982-4025-86B7-541812BFFE56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78569790-7982-4025-86B7-541812BFFE56}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BD7C78AE-8621-4130-9096-F8D1F1F779C7}
+	EndGlobalSection
+EndGlobal
