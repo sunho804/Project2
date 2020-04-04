@@ -22,7 +22,7 @@ namespace CardLibrary
     [ServiceContract(CallbackContract = typeof(ICallback))]
     public interface IShoe
     {
-        [OperationContract]
+        [OperationContract(IsOneWay = true)]
         void Shuffle();
         [OperationContract]
         Card Draw();
@@ -39,6 +39,9 @@ namespace CardLibrary
         string[] GetAllMessages();
         [OperationContract]
         string[] GetAllPlayers();
+        int NumCards { [OperationContract] get; }
+
+        [OperationContract] bool ToggleCallbacks();
     }
 
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
@@ -75,11 +78,9 @@ namespace CardLibrary
             if (cardIdx >= cards.Count())
                 throw new IndexOutOfRangeException("The shoe is empty.");
 
-            Console.WriteLine($"Shoe object #{objNum} Dealing {cards[cardIdx].ToString()}");
-
+            //logEvent($"Dealing: {cards[cardIdx].ToString()}");
             Card card = cards[cardIdx++];
 
-            // Initiate callbacks
             updateAllClients(false);
 
             return card;

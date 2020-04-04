@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ServiceModel;
+
 using CardLibrary;
 
 namespace GoFishClient
@@ -20,13 +21,12 @@ namespace GoFishClient
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant, UseSynchronizationContext = false)]
-    public partial class MainWindow : Window, ICallback
+    public partial class MainWindow : Window
     {
         private string name = "";
         private IShoe shoe = null;
         private int cardCount = 0;
-        //private IShoe msgBrd = null;
+        private bool callbacksEnabled = false;
 
         //in board, show card count 
 
@@ -34,6 +34,15 @@ namespace GoFishClient
         {
             InitializeComponent();
 
+            ChannelFactory<IShoe> channel = new ChannelFactory<IShoe>("ShoeEndPoint");
+            shoe = channel.CreateChannel();
+
+
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void nameSetBtn_Click(object sender, RoutedEventArgs e)
