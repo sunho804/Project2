@@ -33,8 +33,6 @@ namespace GoFishClient
         public MainWindow()
         {
             InitializeComponent();
-
-            
         }
 
         private void nameSetBtn_Click(object sender, RoutedEventArgs e)
@@ -50,6 +48,7 @@ namespace GoFishClient
 
                     connectToMessageBoard();
                     shoe.AddPlayer(nameTxtBox.Text);
+                    shoe.PostMessage(nameTxtBox.Text + " has joined.");
                 }
                 catch (Exception ex)
                 {
@@ -75,8 +74,12 @@ namespace GoFishClient
                     Card card = shoe.Draw();
 
                     cardListBox.Items.Insert(0, card);
+                    Console.WriteLine(card);
                     //shoe.NumCards.ToString();
                 }
+                
+                findBooks();
+                playBtn.IsEnabled = false;
             }
             catch (Exception ex)
             {
@@ -91,6 +94,7 @@ namespace GoFishClient
                 //draw 1 card
                 Card card = shoe.Draw();
                 cardListBox.Items.Insert(cardListBox.Items.Count, card);
+                findBooks();
             }
             catch (Exception ex)
             {
@@ -185,6 +189,36 @@ namespace GoFishClient
             {
                 // Not the dispatcher thread that's running this method!
                 this.Dispatcher.BeginInvoke(new ClientUpdateDelegate(UpdateGui), info);
+            }
+        }
+        
+        public void findBooks()
+        {
+            List<Card> cards = new List<Card>();
+            foreach (Card c1 in cardListBox.Items) { cards.Add(c1); }
+            List<Card> matches = new List<Card>();
+            for(int i = 0; i < cards.Count; i++)
+            {
+                for (int y = 1; y < cards.Count; y++)
+                {
+                    if(cards[i].Rank == cards[y].Rank)
+                    {
+                        if(i != y)
+                        {
+                            string book = (cards[i] + " and " + cards[y]);
+                            bookListBox.Items.Insert(0, book);
+                            Card match1 = cards[i];
+                            Card match2 = cards[y];
+                            cards.Remove(match1);
+                            cards.Remove(match2);
+                        }
+                    }
+                }
+            }
+            cardListBox.Items.Clear();
+            foreach (Card c in cards)
+            {
+                cardListBox.Items.Insert(0, c);
             }
         }
     }
