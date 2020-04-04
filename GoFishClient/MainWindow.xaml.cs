@@ -159,6 +159,7 @@ namespace GoFishClient
                 try
                 {
                     playersListBox.ItemsSource = names;
+                    playersAskComboBox.ItemsSource = names;
                 }
                 catch (Exception ex)
                 {
