@@ -21,7 +21,7 @@ namespace GoFishClient
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, ICallback
     {
         private string name = "";
         private IShoe shoe = null;
@@ -34,15 +34,7 @@ namespace GoFishClient
         {
             InitializeComponent();
 
-            ChannelFactory<IShoe> channel = new ChannelFactory<IShoe>("ShoeEndPoint");
-            shoe = channel.CreateChannel();
-
-
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            
         }
 
         private void nameSetBtn_Click(object sender, RoutedEventArgs e)
@@ -111,7 +103,7 @@ namespace GoFishClient
             try
             {
                 // Configure the ABCs of using the MessageBoard service
-                DuplexChannelFactory<IShoe> channel = new DuplexChannelFactory<IShoe>(this, "MessagingService");
+                DuplexChannelFactory<IShoe> channel = new DuplexChannelFactory<IShoe>(this, "ShoeEndPoint");
 
                 // Activate a MessageBoard object
                 shoe = channel.CreateChannel();
