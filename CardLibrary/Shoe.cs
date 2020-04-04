@@ -12,8 +12,13 @@ namespace CardLibrary
     public interface ICallback
     {
         [OperationContract(IsOneWay = true)] void UpdateGui(CallBackInfo info);
+        [OperationContract(IsOneWay = true)]
+        void SendAllMessages(string[] messages);
+        [OperationContract(IsOneWay = true)]
+        void AddPlayers(string[] names);
     }
 
+    //[ServiceContract]
     [ServiceContract(CallbackContract = typeof(ICallback))]
     public interface IShoe
     {
@@ -22,37 +27,49 @@ namespace CardLibrary
         [OperationContract]
         Card Draw();
         int NumCards { [OperationContract] get; }
+        [OperationContract]
+        bool Join(string name);
+        [OperationContract(IsOneWay = true)]
+        void Leave(string name);
+        [OperationContract(IsOneWay = true)]
+        void PostMessage(string msg);
+        [OperationContract(IsOneWay = true)]
+        void AddPlayer(string name);
+        [OperationContract]
+        string[] GetAllMessages();
+        [OperationContract]
+        string[] GetAllPlayers();
+        int NumCards { [OperationContract] get; }
 
         [OperationContract] bool ToggleCallbacks();
     }
 
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
-    public class Shoe : IDisposable, IShoe
+    public class Shoe : IShoe
     {
         //private attributes
         private List<Card> cards = null;
         private int cardIdx;
-        private StreamWriter log = null;
-
-        private HashSet<ICallback> callbacks = new HashSet<ICallback>();
+        private static uint objCount = 0;
+        private uint objNum;
+        private Dictionary<string, ICallback> callbacks = new Dictionary<string, ICallback>();
+        private List<string> messages = new List<string>();
+        private List<string> players = new List<string>();
 
         public Shoe()
         {
-            log = new StreamWriter("shoe.log");
-            logEvent("Creating the Shoe");
-
+            objNum = ++objCount;
             cards = new List<Card>();
             repopulate();
         }
 
         public void Shuffle()
         {
-            logEvent("Shuffling the Shoe");
-
             Random rng = new Random();
             cards = cards.OrderBy(card => rng.Next()).ToList();
             cardIdx = 0;
 
+            // Initiate callbacks
             updateAllClients(true);
         }
 
@@ -73,8 +90,6 @@ namespace CardLibrary
         {
             get
             {
-                // Returns the number of cards in the shoe that haven't aready 
-                // been dealt via Draw()
                 return cards.Count - cardIdx;
             }
         }
@@ -83,7 +98,7 @@ namespace CardLibrary
 
         private void repopulate()
         {
-            logEvent($"Repopulating the Shoe with 1 deck");
+            Console.WriteLine($"Shoe object #{objNum}");
 
             // Clear out the "old" cards
             cards.Clear();
@@ -101,71 +116,84 @@ namespace CardLibrary
             Shuffle();
         }
 
-        private void logEvent(string msg)
+        public bool Join(string name)
         {
-            log.WriteLine(msg);
-        }
-
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects).
-                    log.Dispose();
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
-
-                disposedValue = true;
-            }
-        }
-
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~Shoe()
-        // {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
-
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
-        }
-
-        public bool ToggleCallbacks()
-        {
-            ICallback cb = OperationContext.Current.GetCallbackChannel<ICallback>();
-
-            if (callbacks.Contains(cb))
-            {
-                callbacks.Remove(cb);
+            if (callbacks.ContainsKey(name.ToUpper()))
                 return false;
-            }
             else
             {
-                callbacks.Add(cb);
+                // Retrieve client's callback proxy
+                ICallback cb = OperationContext.Current.GetCallbackChannel<ICallback>();
+
+                // Save alias and callback proxy
+                callbacks.Add(name.ToUpper(), cb);
+
                 return true;
             }
         }
-        private void updateAllClients(bool emptyHand)
-        {
-            CallBackInfo info = new CallBackInfo(NumCards, emptyHand);
 
-            foreach (ICallback cb in callbacks)
-                cb.UpdateGui(info);
+
+        public void Leave(string name)
+        {
+            if (callbacks.ContainsKey(name.ToUpper()))
+            {
+                callbacks.Remove(name.ToUpper());
+            }
+            if (players.Contains(name.ToUpper()))
+                players.Remove(name.ToUpper());
         }
 
-        #endregion
+        public void AddPlayer(string name)
+        {
+            players.Insert(players.Count, name);
+            updatePlayers();
+        }
+
+        public void PostMessage(string message)
+        {
+            messages.Insert(0, message);
+            updateAllUsers();
+        }
+
+        public string[] GetAllMessages()
+        {
+            return messages.ToArray<string>();
+        }
+
+        public string[] GetAllPlayers()
+        {
+            return players.ToArray<string>();
+        }
+
+        // Helper methods
+
+        private void updateAllUsers()
+        {
+            String[] msgs = messages.ToArray<string>();
+            foreach (ICallback cb in callbacks.Values)
+                cb.SendAllMessages(msgs);
+        }
+
+        private void updateAllClients(bool emptyHand)
+        {
+            CallBackInfo info = new CallBackInfo(cards.Count - cardIdx, emptyHand);
+
+            foreach (var cb in callbacks)
+                if (cb.Value != null)
+                    cb.Value.UpdateGui(info);
+        }
+
+        private void updatePlayers()
+        {
+            //List<string> playernames = new List<string>();
+            //foreach (KeyValuePair<string, ICallback> entry in callbacks)
+            //{
+            //    playernames.Add(entry.Key);
+            //}
+            String[] players = this.players.ToArray<string>();
+            foreach (ICallback cb in callbacks.Values)
+                cb.AddPlayers(players);
+        }
 
     }
 }

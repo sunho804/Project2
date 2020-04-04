@@ -21,28 +21,22 @@ namespace GoFishClient
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-
-    [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant, UseSynchronizationContext = false)]
-    public partial class MainWindow : Window, ICallback
+    public partial class MainWindow : Window
     {
         private string name = "";
         private IShoe shoe = null;
         private int cardCount = 0;
         private bool callbacksEnabled = false;
 
-        private string prefix = "";
-
         //in board, show card count 
 
         public MainWindow()
         {
             InitializeComponent();
-            try
-            {
-                DuplexChannelFactory<IShoe> channel = new DuplexChannelFactory<IShoe>(this, "ShoeEndPoint");
-                shoe = channel.CreateChannel();
 
-                shoe.RegisterForCallbacks();
+            ChannelFactory<IShoe> channel = new ChannelFactory<IShoe>("ShoeEndPoint");
+            shoe = channel.CreateChannel();
+
 
             }
             catch(Exception ex)
@@ -57,13 +51,13 @@ namespace GoFishClient
             {
                 try
                 {
-                    //msgBrd.PostMessage(prefix + nameTxtBox.Text);
-                    name = nameTxtBox.Text;
-                    nameTxtBox.Clear();
-                    playersListBox.Items.Insert(0, name);
-                    //TODO: UPDATE ALL USER'S WINDOW
-
+                    // shoe.PostMessage(nameTxtBox.Text);
+                    //nameTxtBox.Clear();
                     //listMessages.ItemsSource = msgBrd.GetAllMessages();
+                    nameSetBtn.IsEnabled = nameTxtBox.IsEnabled = boardListBox.IsEnabled = true;
+
+                    connectToMessageBoard();
+                    shoe.AddPlayer(nameTxtBox.Text);
                 }
                 catch (Exception ex)
                 {
@@ -74,6 +68,8 @@ namespace GoFishClient
 
         private void closeBtn_Click(object sender, RoutedEventArgs e)
         {
+            if (shoe != null)
+                shoe.Leave(nameTxtBox.Text);
             this.Close();
         }
 
@@ -81,7 +77,6 @@ namespace GoFishClient
         {
             try
             {
-                string welcome = (name + " has joined GO FISH");
                 //draw 5 cards to each player
                 for (var i = 0; i < 5; i++)
                 {
@@ -90,9 +85,6 @@ namespace GoFishClient
                     cardListBox.Items.Insert(0, card);
                     //shoe.NumCards.ToString();
                 }
-                boardListBox.Items.Insert(0, welcome);
-                
-                //TODO: CHECK FOR CARD MATCHES(BOOKS)
             }
             catch (Exception ex)
             {
@@ -107,15 +99,80 @@ namespace GoFishClient
                 //draw 1 card
                 Card card = shoe.Draw();
                 cardListBox.Items.Insert(cardListBox.Items.Count, card);
-                //card
-                //TODO: CHECK FOR CARD MATCHES(BOOKS)
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
         }
-        // Implement ICallback contract
+
+        private void connectToMessageBoard()
+        {
+            try
+            {
+                // Configure the ABCs of using the MessageBoard service
+                DuplexChannelFactory<IShoe> channel = new DuplexChannelFactory<IShoe>(this, "MessagingService");
+
+                // Activate a MessageBoard object
+                shoe = channel.CreateChannel();
+
+                if (shoe.Join(nameTxtBox.Text))
+                {
+                    // Alias accepted by the service so update GUI
+                    boardListBox.ItemsSource = shoe.GetAllMessages();
+                    playersListBox.ItemsSource = shoe.GetAllPlayers();
+                    nameTxtBox.IsEnabled = nameSetBtn.IsEnabled = false;
+                }
+                else
+                {
+                    // Alias rejected by the service so nullify service proxies
+                    shoe = null;
+                    MessageBox.Show("ERROR: Alias in use. Please try again.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private delegate void GuiUpdateDelegate(string[] messages);
+
+        public void SendAllMessages(string[] messages)
+        {
+            if (this.Dispatcher.Thread == System.Threading.Thread.CurrentThread)
+            {
+                try
+                {
+                    boardListBox.ItemsSource = messages;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            else
+                this.Dispatcher.BeginInvoke(new GuiUpdateDelegate(SendAllMessages), new object[] { messages });
+        }
+
+
+        public void AddPlayers(string[] names)
+        {
+            if (this.Dispatcher.Thread == System.Threading.Thread.CurrentThread)
+            {
+                try
+                {
+                    playersListBox.ItemsSource = names;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            else
+                this.Dispatcher.BeginInvoke(new GuiUpdateDelegate(AddPlayers), new object[] { names });
+        }
+
         private delegate void ClientUpdateDelegate(CallBackInfo info);
 
         public void UpdateGui(CallBackInfo info)
@@ -123,24 +180,20 @@ namespace GoFishClient
             if (System.Threading.Thread.CurrentThread == this.Dispatcher.Thread)
             {
                 // Update the GUI
-                Console.WriteLine("updateGUI");
+                //txtShoeCount.Text = info.NumCards.ToString();
+                //sliderDecks.Value = info.NumDecks;
+                //txtDeckCount.Text = (info.NumDecks == 1 ? "1 Deck" : info.NumDecks + " Decks");
+                if (info.EmptyHand)
+                {
+                    cardListBox.Items.Clear();
+                    //txtHandCount.Text = "0";
+                }
             }
             else
             {
-                // Only the main (dispatcher) thread can change the GUI
+                // Not the dispatcher thread that's running this method!
                 this.Dispatcher.BeginInvoke(new ClientUpdateDelegate(UpdateGui), info);
             }
-        }
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-           // if (shoe != null && callbacksEnabled)
-              //  Unsubscribe from the callbacks to prevent a runtime error in the service
-               // shoe.ToggleCallbacks();
-        }
-
-        public void SendAllMessages(string[] messages)
-        {
-            throw new NotImplementedException();
         }
     }
 }
