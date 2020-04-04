@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ServiceModel;
+
 using CardLibrary;
 
 namespace GoFishClient
@@ -20,22 +21,34 @@ namespace GoFishClient
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+
+    [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant, UseSynchronizationContext = false)]
+    public partial class MainWindow : Window, ICallback
     {
         private string name = "";
         private IShoe shoe = null;
         private int cardCount = 0;
+        private bool callbacksEnabled = false;
+
+        private string prefix = "";
 
         //in board, show card count 
 
         public MainWindow()
         {
             InitializeComponent();
+            try
+            {
+                DuplexChannelFactory<IShoe> channel = new DuplexChannelFactory<IShoe>(this, "ShoeEndPoint");
+                shoe = channel.CreateChannel();
 
-            ChannelFactory<IShoe> channel = new ChannelFactory<IShoe>("ShoeEndPoint");
-            shoe = channel.CreateChannel();
+                shoe.RegisterForCallbacks();
 
-
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void nameSetBtn_Click(object sender, RoutedEventArgs e)
@@ -45,7 +58,11 @@ namespace GoFishClient
                 try
                 {
                     //msgBrd.PostMessage(prefix + nameTxtBox.Text);
+                    name = nameTxtBox.Text;
                     nameTxtBox.Clear();
+                    playersListBox.Items.Insert(0, name);
+                    //TODO: UPDATE ALL USER'S WINDOW
+
                     //listMessages.ItemsSource = msgBrd.GetAllMessages();
                 }
                 catch (Exception ex)
@@ -64,14 +81,18 @@ namespace GoFishClient
         {
             try
             {
+                string welcome = (name + " has joined GO FISH");
                 //draw 5 cards to each player
                 for (var i = 0; i < 5; i++)
                 {
-                    string card = shoe.Draw();
+                    Card card = shoe.Draw();
 
                     cardListBox.Items.Insert(0, card);
                     //shoe.NumCards.ToString();
                 }
+                boardListBox.Items.Insert(0, welcome);
+                
+                //TODO: CHECK FOR CARD MATCHES(BOOKS)
             }
             catch (Exception ex)
             {
@@ -84,13 +105,42 @@ namespace GoFishClient
             try
             {
                 //draw 1 card
-                string card = shoe.Draw();
+                Card card = shoe.Draw();
                 cardListBox.Items.Insert(cardListBox.Items.Count, card);
+                //card
+                //TODO: CHECK FOR CARD MATCHES(BOOKS)
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+        // Implement ICallback contract
+        private delegate void ClientUpdateDelegate(CallBackInfo info);
+
+        public void UpdateGui(CallBackInfo info)
+        {
+            if (System.Threading.Thread.CurrentThread == this.Dispatcher.Thread)
+            {
+                // Update the GUI
+                Console.WriteLine("updateGUI");
+            }
+            else
+            {
+                // Only the main (dispatcher) thread can change the GUI
+                this.Dispatcher.BeginInvoke(new ClientUpdateDelegate(UpdateGui), info);
+            }
+        }
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+           // if (shoe != null && callbacksEnabled)
+              //  Unsubscribe from the callbacks to prevent a runtime error in the service
+               // shoe.ToggleCallbacks();
+        }
+
+        public void SendAllMessages(string[] messages)
+        {
+            throw new NotImplementedException();
         }
     }
 }

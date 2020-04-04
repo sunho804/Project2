@@ -1,0 +1,5 @@
+C:\5th Semester\.NET\Project2\Project2-master\CardLibrary\bin\Debug\CardLibrary.dll
+C:\5th Semester\.NET\Project2\Project2-master\CardLibrary\bin\Debug\CardLibrary.pdb
+C:\5th Semester\.NET\Project2\Project2-master\CardLibrary\obj\Debug\CardLibrary.dll
+C:\5th Semester\.NET\Project2\Project2-master\CardLibrary\obj\Debug\CardLibrary.pdb
+C:\5th Semester\.NET\Project2\Project2-master\CardLibrary\obj\Debug\CardLibrary.csprojAssemblyReference.cache
