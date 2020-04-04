@@ -34,15 +34,7 @@ namespace GoFishClient
         {
             InitializeComponent();
 
-            ChannelFactory<IShoe> channel = new ChannelFactory<IShoe>("ShoeEndPoint");
-            shoe = channel.CreateChannel();
-
-
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            
         }
 
         private void nameSetBtn_Click(object sender, RoutedEventArgs e)

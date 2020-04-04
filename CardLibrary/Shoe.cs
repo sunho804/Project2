@@ -39,9 +39,8 @@ namespace CardLibrary
         string[] GetAllMessages();
         [OperationContract]
         string[] GetAllPlayers();
-        int NumCards { [OperationContract] get; }
 
-        [OperationContract] bool ToggleCallbacks();
+        //[OperationContract] bool ToggleCallbacks();
     }
 
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
@@ -195,5 +194,20 @@ namespace CardLibrary
                 cb.AddPlayers(players);
         }
 
+        //public bool ToggleCallbacks()
+        //{
+        //    ICallback cb = OperationContext.Current.GetCallbackChannel<ICallback>();
+
+        //    if (callbacks.Values.Contains(cb))
+        //    {
+        //        callbacks.Remove(cb);
+        //        return false;
+        //    }
+        //    else
+        //    {
+        //        callbacks.Add(cb);
+        //        return true;
+        //    }
+        //}
     }
 }
