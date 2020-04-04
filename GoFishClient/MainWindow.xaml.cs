@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -49,6 +49,7 @@ namespace GoFishClient
                     connectToMessageBoard();
                     shoe.AddPlayer(nameTxtBox.Text);
                     shoe.PostMessage(nameTxtBox.Text + " has joined.");
+                    loadCardRanksComboBox();
                 }
                 catch (Exception ex)
                 {
@@ -102,6 +103,11 @@ namespace GoFishClient
             }
         }
 
+        private void askBtn_Click(object sender, RoutedEventArgs e)
+        {
+            shoe.PostMessage(playersAskComboBox.SelectedItem + ", do you have any " + cardsAskComboBox.SelectedItem + "?");
+        }
+
         private void connectToMessageBoard()
         {
             try
@@ -150,7 +156,6 @@ namespace GoFishClient
             else
                 this.Dispatcher.BeginInvoke(new GuiUpdateDelegate(SendAllMessages), new object[] { messages });
         }
-
 
         public void AddPlayers(string[] names)
         {
@@ -222,5 +227,12 @@ namespace GoFishClient
                 cardListBox.Items.Insert(0, c);
             }
         }
+
+        public void loadCardRanksComboBox()
+        {
+            cardsAskComboBox.ItemsSource = Enum.GetValues(typeof(Card.RankID)).Cast<Card.RankID>();
+        }
+
+
     }
 }
