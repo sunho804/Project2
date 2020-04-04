@@ -6,3 +6,5 @@ C:\5th Semester\.NET\Project2\Project2-master\CardLibrary\obj\Debug\CardLibrary.
 C:\Users\Sunho\Desktop\2020WINTER\Component.NET\Project\Project2\CardLibrary\obj\Debug\CardLibrary.csprojAssemblyReference.cache
 C:\Users\Sunho\Desktop\2020WINTER\Component.NET\Project\Project2\CardLibrary\obj\Debug\CardLibrary.dll
 C:\Users\Sunho\Desktop\2020WINTER\Component.NET\Project\Project2\CardLibrary\obj\Debug\CardLibrary.pdb
+C:\Users\Sunho\Desktop\2020WINTER\Component.NET\Project\Project2\CardLibrary\bin\Debug\CardLibrary.dll
+C:\Users\Sunho\Desktop\2020WINTER\Component.NET\Project\Project2\CardLibrary\bin\Debug\CardLibrary.pdb
