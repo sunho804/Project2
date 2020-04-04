@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,9 +11,12 @@ namespace CardLibrary
     [ServiceContract]
     public interface ICallback
     {
-        [OperationContract(IsOneWay = true)] void UpdateGui(CallBackInfo info);
+        [OperationContract(IsOneWay = true)] 
+        void UpdateGui(CallBackInfo info);
+
         [OperationContract(IsOneWay = true)]
         void SendAllMessages(string[] messages);
+
         [OperationContract(IsOneWay = true)]
         void AddPlayers(string[] names);
     }
@@ -79,8 +82,6 @@ namespace CardLibrary
 
             //logEvent($"Dealing: {cards[cardIdx].ToString()}");
             Card card = cards[cardIdx++];
-
-            updateAllClients(false);
 
             return card;
         }
@@ -193,21 +194,5 @@ namespace CardLibrary
             foreach (ICallback cb in callbacks.Values)
                 cb.AddPlayers(players);
         }
-
-        //public bool ToggleCallbacks()
-        //{
-        //    ICallback cb = OperationContext.Current.GetCallbackChannel<ICallback>();
-
-        //    if (callbacks.Values.Contains(cb))
-        //    {
-        //        callbacks.Remove(cb);
-        //        return false;
-        //    }
-        //    else
-        //    {
-        //        callbacks.Add(cb);
-        //        return true;
-        //    }
-        //}
-    }
+}
 }
