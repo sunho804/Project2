@@ -21,13 +21,11 @@ namespace CardLibrary
     public class CallBackInfo 
     {
         [DataMember] public int NumCards { get; private set; }
-        [DataMember] public int NumDecks { get; private set; }
         [DataMember] public bool EmptyHand { get; private set; }
 
-        public CallBackInfo(int c, int d, bool e)
+        public CallBackInfo(int c, bool e)
         {
             NumCards = c;
-            NumDecks = d;
             EmptyHand = e;
         }
     }
