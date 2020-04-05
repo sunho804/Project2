@@ -21,18 +21,21 @@ namespace GoFishClient
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant, UseSynchronizationContext = false)]
     public partial class MainWindow : Window, ICallback
     {
         private string name = "";
         private IShoe shoe = null;
         private int cardCount = 0;
         private bool callbacksEnabled = false;
+        Tuple<string, Tuple<string, string>> askinfo = null;
 
         //in board, show card count 
 
         public MainWindow()
         {
             InitializeComponent();
+            playBtn.IsEnabled = false;
         }
 
         private void nameSetBtn_Click(object sender, RoutedEventArgs e)
@@ -50,6 +53,9 @@ namespace GoFishClient
                     shoe.AddPlayer(nameTxtBox.Text);
                     shoe.PostMessage(nameTxtBox.Text + " has joined.");
                     loadCardRanksComboBox();
+                    playBtn.IsEnabled = true;
+                    cardCount = shoe.NumCards - 5;
+                    playersAskComboBox.Items.Remove(nameTxtBox.Text);
                 }
                 catch (Exception ex)
                 {
@@ -60,8 +66,11 @@ namespace GoFishClient
 
         private void closeBtn_Click(object sender, RoutedEventArgs e)
         {
+            shoe.PostMessage(nameTxtBox.Text + " has left.");
+            playersListBox.Items.Remove(nameTxtBox.Text);
             if (shoe != null)
                 shoe.Leave(nameTxtBox.Text);
+
             this.Close();
         }
 
@@ -81,6 +90,7 @@ namespace GoFishClient
                 
                 findBooks();
                 playBtn.IsEnabled = false;
+                shoe.PostMessage($"There is now {cardCount} cards left in the pile.");
             }
             catch (Exception ex)
             {
@@ -96,6 +106,7 @@ namespace GoFishClient
                 Card card = shoe.Draw();
                 cardListBox.Items.Insert(cardListBox.Items.Count, card);
                 findBooks();
+                shoe.PostMessage($"There is now {cardCount} cards left in the pile.");
             }
             catch (Exception ex)
             {
@@ -106,7 +117,18 @@ namespace GoFishClient
         private void askBtn_Click(object sender, RoutedEventArgs e)
         {
             shoe.PostMessage(playersAskComboBox.SelectedItem + ", do you have any " + cardsAskComboBox.SelectedItem + "?");
+
+            shoe.StoreCard(nameTxtBox.Text, playersAskComboBox.SelectedItem.ToString(), cardsAskComboBox.SelectedItem.ToString());
+            //foreach(Card c in cardListBox.Items)
+            //{
+            //    if(c.Rank.ToString() == cardsAskComboBox.SelectedItem.ToString())
+            //    {
+            //        Card selected = c;
+            //        cardListBox.Items.Remove(c);
+            //    }
+            //}
         }
+
 
         private void connectToMessageBoard()
         {
@@ -182,7 +204,7 @@ namespace GoFishClient
             if (System.Threading.Thread.CurrentThread == this.Dispatcher.Thread)
             {
                 // Update the GUI
-                //txtShoeCount.Text = info.NumCards.ToString();
+                cardCount = info.NumCards;
                 //sliderDecks.Value = info.NumDecks;
                 //txtDeckCount.Text = (info.NumDecks == 1 ? "1 Deck" : info.NumDecks + " Decks");
                 if (info.EmptyHand)
@@ -197,35 +219,65 @@ namespace GoFishClient
                 this.Dispatcher.BeginInvoke(new ClientUpdateDelegate(UpdateGui), info);
             }
         }
-        
+
+        public void AskPlayer(CallBackInfo info)
+        {
+
+        }
+
         public void findBooks()
         {
-            List<Card> cards = new List<Card>();
-            foreach (Card c1 in cardListBox.Items) { cards.Add(c1); }
-            List<Card> matches = new List<Card>();
-            for(int i = 0; i < cards.Count; i++)
+            //List<Card> cards = new List<Card>();
+            //foreach (Card c1 in cardListBox.Items) { cards.Add(c1); }
+            //List<Card> matches = new List<Card>();
+            List<string> matches = new List<string>();
+            List<Card> potentialMatches = new List<Card>();
+
+            int count = 0;
+            
+            for(int i = 0; i < cardListBox.Items.Count; i++)
             {
-                for (int y = 1; y < cards.Count; y++)
+                Card.RankID r = (cardListBox.Items[i] as Card).Rank;
+                for(int j = i + 1; j < cardListBox.Items.Count; j++)
                 {
-                    if(cards[i].Rank == cards[y].Rank)
+                    Card.RankID nextR = (cardListBox.Items[j] as Card).Rank;
+                    if (r == nextR)
                     {
-                        if(i != y)
-                        {
-                            string book = (cards[i] + " and " + cards[y]);
-                            bookListBox.Items.Insert(0, book);
-                            Card match1 = cards[i];
-                            Card match2 = cards[y];
-                            cards.Remove(match1);
-                            cards.Remove(match2);
-                        }
+                        count++;
+                        Card c = cardListBox.Items[j] as Card;
+                        potentialMatches.Add(c);
+                    }
+                    if (count == 4)
+                    {
+                        matches.Add(r.ToString());
+                        foreach (Card c in potentialMatches)
+                            cardListBox.Items.Remove(c);
                     }
                 }
             }
-            cardListBox.Items.Clear();
-            foreach (Card c in cards)
-            {
-                cardListBox.Items.Insert(0, c);
-            }
+            //for(int i = 0; i < cards.Count; i++)
+            //{
+            //    for (int y = 1; y < cards.Count; y++)
+            //    {
+            //        if(cards[i].Rank == cards[y].Rank)
+            //        {
+            //            if(i != y)
+            //            {
+            //                string book = (cards[i] + " and " + cards[y]);
+            //                bookListBox.Items.Insert(0, book);
+            //                Card match1 = cards[i];
+            //                Card match2 = cards[y];
+            //                cards.Remove(match1);
+            //                cards.Remove(match2);
+            //            }
+            //        }
+            //    }
+            //}
+            //cardListBox.Items.Clear();
+            //foreach (Card c in cards)
+            //{
+            //    cardListBox.Items.Insert(0, c);
+            //}
         }
 
         public void loadCardRanksComboBox()

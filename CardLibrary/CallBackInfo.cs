@@ -22,11 +22,21 @@ namespace CardLibrary
     {
         [DataMember] public int NumCards { get; private set; }
         [DataMember] public bool EmptyHand { get; private set; }
+        //[DataMember] public string PlayerName { get; private set; } //player who gets asked
+        //[DataMember] public string PlayerAskingName { get; private set; } //player who's asking
+        //[DataMember] public string CardRank { get; private set; }
 
         public CallBackInfo(int c, bool e)
         {
             NumCards = c;
             EmptyHand = e;
         }
+
+        //public CallBackInfo(string name, string askingName, string rank)
+        //{
+        //    PlayerName = name;
+        //    PlayerAskingName = askingName;
+        //    CardRank = rank;
+        //}
     }
 }
