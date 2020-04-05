@@ -47,9 +47,16 @@ namespace GoFishClient
                     nameSetBtn.IsEnabled = nameTxtBox.IsEnabled = boardListBox.IsEnabled = true;
 
                     connectToMessageBoard();
-                    shoe.AddPlayer(nameTxtBox.Text);
-                    shoe.PostMessage(nameTxtBox.Text + " has joined.");
-                    loadCardRanksComboBox();
+                    if(shoe.GetAllPlayers().Length >= 6)
+                    {
+                        MessageBox.Show("Maximum amount of players reached. (Max.6)");
+                    }
+                    else
+                    {
+                        shoe.AddPlayer(nameTxtBox.Text);
+                        shoe.PostMessage(nameTxtBox.Text + " has joined.");
+                        loadCardRanksComboBox();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -225,6 +232,11 @@ namespace GoFishClient
             foreach (Card c in cards)
             {
                 cardListBox.Items.Insert(0, c);
+            }
+            if(cardListBox.Items.Count >= 13)
+            {
+                MessageBox.Show("CONGRATULATIONS! YOU WON");
+                AskBtn.IsEnabled = false;
             }
         }
 
