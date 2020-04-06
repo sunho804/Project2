@@ -24,7 +24,8 @@
         <Button Content="Play" HorizontalAlignment="Left" Margin="409,18,0,0" VerticalAlignment="Top" Width="54" Name="playBtn" Click="playBtn_Click"/>
         <Button Content="Close" HorizontalAlignment="Left" Margin="704,368,0,0" VerticalAlignment="Top" Width="59" Name="closeBtn" Click="closeBtn_Click"/>
         <Label Content="Number of Players" HorizontalAlignment="Left" Margin="492,10,0,0" VerticalAlignment="Top"/>
-        <ComboBox HorizontalAlignment="Left" Margin="492,41,0,0" VerticalAlignment="Top" Width="108" Name="numPlayersCombobox"/>
+        <ComboBox HorizontalAlignment="Left" Margin="492,71,0,0" VerticalAlignment="Top" Width="108" Name="numPlayersCombobox" SelectionChanged="numPlayersCombobox_SelectionChanged"/>
+        <Label FontSize="8px" Content="Only first player can set" HorizontalAlignment="Left" Margin="494,32,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

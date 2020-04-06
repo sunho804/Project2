@@ -36,6 +36,7 @@ namespace CardLibrary
         [OperationContract]
         Card Draw();
         int NumCards { [OperationContract] get; }
+        int NumPlayers { [OperationContract] get; [OperationContract] set; }
         Tuple<string, Tuple<string, string>> AskingInfo { [OperationContract] get; }
         [OperationContract]
         bool Join(string name);
@@ -70,6 +71,7 @@ namespace CardLibrary
         private List<string> players = new List<string>();
         private Tuple<string, Tuple<string, string>> askInfo = null;
         private bool asking = false;
+        private int numPlayers = 0;
 
         public Shoe()
         {
@@ -113,6 +115,19 @@ namespace CardLibrary
             get
             {
                 return cards.Count - cardIdx;
+            }
+        }
+
+        public int NumPlayers
+        {
+            get
+            {
+                return numPlayers;
+            }
+            set
+            {
+                if (numPlayers != value)
+                    numPlayers = value;
             }
         }
 
@@ -212,7 +227,7 @@ namespace CardLibrary
 
         private void updateAllClients(bool emptyHand)
         {
-            CallBackInfo info = new CallBackInfo(cards.Count - cardIdx - 1, emptyHand);
+            CallBackInfo info = new CallBackInfo(cards.Count - cardIdx - 1, emptyHand, numPlayers);
 
             foreach (var cb in callbacks)
                 if (cb.Value != null)

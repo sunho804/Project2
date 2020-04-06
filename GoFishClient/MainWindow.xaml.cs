@@ -27,9 +27,11 @@ namespace GoFishClient
         private string name = "";
         private IShoe shoe = null;
         private int cardCount = 0;
-        private bool callbacksEnabled = false;
+        private bool gameOver = false;
+        private bool turnOver = false;
         private Tuple<string, Tuple<string, string>> askinfo = null;
         private Dictionary<string, int> cardMatches = null;
+        private int numPlayers = 0;
 
         //in board, show card count 
 
@@ -45,9 +47,6 @@ namespace GoFishClient
             {
                 try
                 {
-                    // shoe.PostMessage(nameTxtBox.Text);
-                    //nameTxtBox.Clear();
-                    //listMessages.ItemsSource = msgBrd.GetAllMessages();
                     nameSetBtn.IsEnabled = nameTxtBox.IsEnabled = boardListBox.IsEnabled = true;
 
                     connectToMessageBoard();
@@ -58,6 +57,7 @@ namespace GoFishClient
                     cardCount = shoe.NumCards - 5;
                     playersAskComboBox.Items.Remove(nameTxtBox.Text);
                     createCardMatchesDictionary();
+                    numPlayersCombobox.SelectedIndex = shoe.NumPlayers;
                 }
                 catch (Exception ex)
                 {
@@ -90,7 +90,7 @@ namespace GoFishClient
                 playBtn.IsEnabled = false;
                 shoe.PostMessage($"There is now {cardCount} cards left in the pile.");
 
-                if(playersListBox.Items.Count == Int32.Parse(numPlayersCombobox.SelectedItem.ToString()))
+                if (playersListBox.Items.Count == Int32.Parse(numPlayersCombobox.SelectedItem.ToString()))
                 {
                     shoe.PostMessage("Start game!");
                 }
@@ -110,7 +110,9 @@ namespace GoFishClient
                 cardListBox.Items.Insert(cardListBox.Items.Count, card);
                 cardMatches[card.Rank.ToString()]++;
                 findBooks();
-                shoe.PostMessage($"There is now {cardCount} cards left in the pile.");
+                shoe.PostMessage($"Drawing a card. There is now {cardCount} cards left in the pile.");
+                if (shoe.NumCards == 0)
+                    gameOver = true;
             }
             catch (Exception ex)
             {
@@ -131,6 +133,7 @@ namespace GoFishClient
             //        cardListBox.Items.Remove(c);
             //    }
             //}
+
         }
 
 
@@ -219,6 +222,8 @@ namespace GoFishClient
             {
                 // Update the GUI
                 cardCount = info.NumCards;
+                numPlayers = info.NumPlayers;
+                
                 if (info.EmptyHand)
                 {
                     cardListBox.Items.Clear();
@@ -249,6 +254,7 @@ namespace GoFishClient
                     }
                     foreach (Card c in cardsdelete)
                         cardListBox.Items.Remove(c);
+                    shoe.PostMessage($"Four {entry.Key}s have been found!");
                 }
             }
             for(int i = 0; i < bookListBox.Items.Count; i++)
@@ -271,6 +277,22 @@ namespace GoFishClient
             if (shoe != null)
                 shoe.Leave(nameTxtBox.Text);
             shoe.RemovePlayer(nameTxtBox.Text);
+        }
+
+        private void numPlayersCombobox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if(shoe != null)
+                {
+                    shoe.NumPlayers = (int)numPlayersCombobox.SelectedIndex;
+
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }
