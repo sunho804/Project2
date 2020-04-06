@@ -46,6 +46,8 @@ namespace CardLibrary
         [OperationContract(IsOneWay = true)]
         void AddPlayer(string name);
         [OperationContract(IsOneWay = true)]
+        void RemovePlayer(string name);
+        [OperationContract(IsOneWay = true)]
         void StoreCard(string personAsking, string personAsked, string rank);
         [OperationContract]
         string[] GetAllMessages();
@@ -177,6 +179,12 @@ namespace CardLibrary
             updatePlayers();
         }
 
+        public void RemovePlayer(string name)
+        {
+            players.Remove(name);
+            updatePlayers();
+        }
+
         public void PostMessage(string message)
         {
             messages.Insert(0, message);
@@ -204,7 +212,7 @@ namespace CardLibrary
 
         private void updateAllClients(bool emptyHand)
         {
-            CallBackInfo info = new CallBackInfo(cards.Count - cardIdx, emptyHand);
+            CallBackInfo info = new CallBackInfo(cards.Count - cardIdx - 1, emptyHand);
 
             foreach (var cb in callbacks)
                 if (cb.Value != null)
@@ -213,11 +221,6 @@ namespace CardLibrary
 
         private void updatePlayers()
         {
-            //List<string> playernames = new List<string>();
-            //foreach (KeyValuePair<string, ICallback> entry in callbacks)
-            //{
-            //    playernames.Add(entry.Key);
-            //}
             String[] players = this.players.ToArray<string>();
             foreach (ICallback cb in callbacks.Values)
                 cb.AddPlayers(players);
