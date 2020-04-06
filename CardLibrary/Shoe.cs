@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,6 +19,12 @@ namespace CardLibrary
 
         [OperationContract(IsOneWay = true)]
         void AddPlayers(string[] names);
+
+        //[OperationContract(IsOneWay = true)]
+        //void AskPlayer(CallBackInfo info);
+
+        //[OperationContract(IsOneWay = true)]
+        //void sendCard(CallBackInfo info);
     }
 
     //[ServiceContract]
@@ -30,6 +36,8 @@ namespace CardLibrary
         [OperationContract]
         Card Draw();
         int NumCards { [OperationContract] get; }
+        int NumPlayers { [OperationContract] get; [OperationContract] set; }
+        Tuple<string, Tuple<string, string>> AskingInfo { [OperationContract] get; }
         [OperationContract]
         bool Join(string name);
         [OperationContract(IsOneWay = true)]
@@ -38,6 +46,10 @@ namespace CardLibrary
         void PostMessage(string msg);
         [OperationContract(IsOneWay = true)]
         void AddPlayer(string name);
+        [OperationContract(IsOneWay = true)]
+        void RemovePlayer(string name);
+        [OperationContract(IsOneWay = true)]
+        void StoreCard(string personAsking, string personAsked, string rank);
         [OperationContract]
         string[] GetAllMessages();
         [OperationContract]
@@ -51,12 +63,15 @@ namespace CardLibrary
     {
         //private attributes
         private List<Card> cards = null;
-        private int cardIdx;
+        private int cardIdx = 0;
         private static uint objCount = 0;
         private uint objNum;
         private Dictionary<string, ICallback> callbacks = new Dictionary<string, ICallback>();
         private List<string> messages = new List<string>();
         private List<string> players = new List<string>();
+        private Tuple<string, Tuple<string, string>> askInfo = null;
+        private bool asking = false;
+        private int numPlayers = 0;
 
         public Shoe()
         {
@@ -83,7 +98,16 @@ namespace CardLibrary
             //logEvent($"Dealing: {cards[cardIdx].ToString()}");
             Card card = cards[cardIdx++];
 
+            // Initiate callbacks
+            updateAllClients(false);
+
             return card;
+        }
+
+        public void StoreCard(string personAsking, string personAsked, string rank)
+        {
+            askInfo = new Tuple<string, Tuple<string, string>>(personAsking, new Tuple<string, string>(personAsked, rank));
+            asking = true;
         }
 
         public int NumCards
@@ -91,6 +115,27 @@ namespace CardLibrary
             get
             {
                 return cards.Count - cardIdx;
+            }
+        }
+
+        public int NumPlayers
+        {
+            get
+            {
+                return numPlayers;
+            }
+            set
+            {
+                if (numPlayers != value)
+                    numPlayers = value;
+            }
+        }
+
+        public Tuple<string, Tuple<string, string>> AskingInfo
+        {
+            get
+            {
+                return askInfo;
             }
         }
 
@@ -149,6 +194,12 @@ namespace CardLibrary
             updatePlayers();
         }
 
+        public void RemovePlayer(string name)
+        {
+            players.Remove(name);
+            updatePlayers();
+        }
+
         public void PostMessage(string message)
         {
             messages.Insert(0, message);
@@ -176,7 +227,7 @@ namespace CardLibrary
 
         private void updateAllClients(bool emptyHand)
         {
-            CallBackInfo info = new CallBackInfo(cards.Count - cardIdx, emptyHand);
+            CallBackInfo info = new CallBackInfo(cards.Count - cardIdx - 1, emptyHand, numPlayers);
 
             foreach (var cb in callbacks)
                 if (cb.Value != null)
@@ -185,11 +236,6 @@ namespace CardLibrary
 
         private void updatePlayers()
         {
-            //List<string> playernames = new List<string>();
-            //foreach (KeyValuePair<string, ICallback> entry in callbacks)
-            //{
-            //    playernames.Add(entry.Key);
-            //}
             String[] players = this.players.ToArray<string>();
             foreach (ICallback cb in callbacks.Values)
                 cb.AddPlayers(players);
