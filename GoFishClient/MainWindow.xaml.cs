@@ -24,12 +24,10 @@ namespace GoFishClient
     [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant, UseSynchronizationContext = false)]
     public partial class MainWindow : Window, ICallback
     {
-        private string name = "";
         private IShoe shoe = null;
         private int cardCount = 0;
         private bool gameOver = false;
         private bool turnOver = false;
-        private Tuple<string, Tuple<string, string>> askinfo = null;
         private Dictionary<string, int> cardMatches = null;
         private int numPlayers = 0;
         private Dictionary<string, List<Card>> cardsOfClients = new Dictionary<string, List<Card>>();
