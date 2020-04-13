@@ -31,6 +31,7 @@ namespace GoFishClient
         private Dictionary<string, int> cardMatches = null;
         private int numPlayers = 0;
         private Dictionary<string, List<Card>> cardsOfClients = new Dictionary<string, List<Card>>();
+        private bool gotCard = false;
 
         //in board, show card count 
 
@@ -85,7 +86,7 @@ namespace GoFishClient
                     //shoe.NumCards.ToString();
                     shoe.AddCardToPlayer(nameTxtBox.Text, card);
                 }
-                
+
                 findBooks();
                 playBtn.IsEnabled = false;
                 shoe.PostMessage($"There is now {cardCount} cards left in the pile.");
@@ -109,9 +110,9 @@ namespace GoFishClient
                 //draw 1 card
                 Card card = shoe.Draw();
                 //cardListBox.Items.Insert(cardListBox.Items.Count, card);
-                shoe.AddCardToPlayer(nameTxtBox.Text, card);
                 cardMatches[card.Rank.ToString()]++;
-                findBooks();
+                if(!findBooks())
+                    shoe.AddCardToPlayer(nameTxtBox.Text, card);
                 shoe.PostMessage($"Drawing a card. There is now {cardCount} cards left in the pile.");
                 if (shoe.NumCards == 0)
                     gameOver = true;
@@ -125,24 +126,38 @@ namespace GoFishClient
         private void askBtn_Click(object sender, RoutedEventArgs e)
         {
             shoe.PostMessage(playersAskComboBox.SelectedItem + ", do you have any " + cardsAskComboBox.SelectedItem + "?");
-            
-            if(cardsOfClients.ContainsKey(playersAskComboBox.SelectedItem.ToString()))
+
+            if (cardsOfClients.ContainsKey(playersAskComboBox.SelectedItem.ToString()))
             {
                 List<Card> cardsOfOtherPlayer = cardsOfClients[playersAskComboBox.SelectedItem.ToString()];
                 List<Card> cardsThatWillBePassed = new List<Card>();
 
-                foreach(Card c in cardsOfOtherPlayer)
+                foreach (Card c in cardsOfOtherPlayer)
                 {
-                    if(c.Rank.ToString() == cardsAskComboBox.SelectedItem.ToString())
+                    if (c.Rank.ToString() == cardsAskComboBox.SelectedItem.ToString())
                     {
                         cardsThatWillBePassed.Add(c);
                     }
                 }
-
-                foreach(Card c in cardsThatWillBePassed)
+                if (cardsThatWillBePassed.Count > 0)
                 {
-                    shoe.RemoveCardFromPlayer(playersAskComboBox.SelectedItem.ToString(), c);
-                    shoe.AddCardToPlayer(nameTxtBox.Text, c);
+                    foreach (Card c in cardsThatWillBePassed)
+                    {
+                        shoe.RemoveCardFromPlayer(playersAskComboBox.SelectedItem.ToString(), c);
+                        cardMatches[c.Rank.ToString()]++;
+                        if (!findBooks())
+                            shoe.AddCardToPlayer(nameTxtBox.Text, c);
+                    }
+                    shoe.PostMessage(playersAskComboBox.SelectedItem + " has " + cardsThatWillBePassed.Count + " of " + cardsAskComboBox.SelectedItem + ". You can ask same or another player for another card. ");
+                    gotCard = true;
+
+                }
+                else
+                {
+                    if (!gotCard)
+                        shoe.PostMessage(playersAskComboBox.SelectedItem + " doesn't have " + cardsAskComboBox.SelectedItem + ". Go fish! Draw card.");
+                    else
+                        shoe.PostMessage(nameTxtBox.Text + "'s turn is over. ");
                 }
             }
 
@@ -183,7 +198,7 @@ namespace GoFishClient
         {
             cardMatches = new Dictionary<string, int>();
             var ranks = Enum.GetValues(typeof(Card.RankID)).Cast<Card.RankID>();
-            foreach(var r in ranks)
+            foreach (var r in ranks)
             {
                 cardMatches.Add(r.ToString(), 0);
             }
@@ -255,7 +270,7 @@ namespace GoFishClient
                 // Update the GUI
                 cardCount = info.NumCards;
                 numPlayers = info.NumPlayers;
-                
+
                 if (info.EmptyHand)
                 {
                     cardListBox.Items.Clear();
@@ -268,17 +283,18 @@ namespace GoFishClient
             }
         }
 
-        public void findBooks()
+        public bool findBooks()
         {
+            bool foundbook = false;
             List<Card> cardsdelete = new List<Card>();
             foreach (KeyValuePair<string, int> entry in cardMatches)
             {
                 if (entry.Value == 4)
                 {
                     bookListBox.Items.Add(entry.Key);
-                    for (int i = 0; i < cardListBox.Items.Count; i++)
+                    for (int i = 0; i < cardsOfClients[nameTxtBox.Text].Count; i++)
                     {
-                        Card c = cardListBox.Items[i] as Card;
+                        Card c = cardsOfClients[nameTxtBox.Text][i] as Card;
                         if (c.Rank.ToString() == entry.Key)
                         {
                             cardsdelete.Add(c);
@@ -287,19 +303,21 @@ namespace GoFishClient
                     foreach (Card c in cardsdelete)
                         shoe.RemoveCardFromPlayer(nameTxtBox.Text, c);
                     shoe.PostMessage($"Four {entry.Key}s have been found!");
+                    foundbook = true;
                 }
             }
-            for(int i = 0; i < bookListBox.Items.Count; i++)
+            for (int i = 0; i < bookListBox.Items.Count; i++)
             {
                 cardMatches[bookListBox.Items[i].ToString()] = 0;
             }
-           
+
+            return foundbook;
         }
 
         public void loadComboBoxes()
         {
             cardsAskComboBox.ItemsSource = Enum.GetValues(typeof(Card.RankID)).Cast<Card.RankID>();
-            for(int i = 2; i < 6; i++)
+            for (int i = 2; i < 6; i++)
                 numPlayersCombobox.Items.Add(i);
         }
 
@@ -315,13 +333,13 @@ namespace GoFishClient
         {
             try
             {
-                if(shoe != null)
+                if (shoe != null)
                 {
                     shoe.NumPlayers = (int)numPlayersCombobox.SelectedIndex;
 
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }

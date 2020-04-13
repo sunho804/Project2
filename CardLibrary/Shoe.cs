@@ -11,7 +11,7 @@ namespace CardLibrary
     [ServiceContract]
     public interface ICallback
     {
-        [OperationContract(IsOneWay = true)] 
+        [OperationContract(IsOneWay = true)]
         void UpdateGui(CallBackInfo info);
 
         [OperationContract(IsOneWay = true)]
@@ -192,7 +192,7 @@ namespace CardLibrary
 
         public void AddCardToPlayer(string name, Card c)
         {
-            if(!cardsOfPlayers.ContainsKey(name))
+            if (!cardsOfPlayers.ContainsKey(name))
             {
                 cardsOfPlayers.Add(name, new List<Card>());
                 cardsOfPlayers[name].Add(c);
@@ -204,9 +204,31 @@ namespace CardLibrary
 
         public void RemoveCardFromPlayer(string name, Card c)
         {
-            cardsOfPlayers[name].Remove(c);
+            Card cardDeleted = null;
+            foreach (Card card in cardsOfPlayers[name])
+            {
+                if (card.ToString() == c.ToString())
+                    cardDeleted = card;
+            }
+            cardsOfPlayers[name].Remove(cardDeleted);
+            List<Card> cards = new List<Card>();
+            foreach (var i in cardsOfPlayers[name])
+            {
+                if (i != c)
+                {
+                    cards.Add(i);
+                }
+            }
+            cardsOfPlayers.Remove(name);
+            cardsOfPlayers.Add(name, new List<Card>());
+            foreach (Card card in cards)
+            {
+                cardsOfPlayers[name].Add(card);
+            }
+
             updateCards();
         }
+
         public void PostMessage(string message)
         {
             messages.Insert(0, message);
