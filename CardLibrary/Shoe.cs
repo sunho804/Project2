@@ -20,6 +20,9 @@ namespace CardLibrary
         [OperationContract(IsOneWay = true)]
         void AddPlayers(string[] names);
 
+        [OperationContract(IsOneWay = true)]
+        void UpdateCards(Dictionary<string, List<Card>> cards);
+
         //[OperationContract(IsOneWay = true)]
         //void AskPlayer(CallBackInfo info);
 
@@ -47,6 +50,10 @@ namespace CardLibrary
         void AddPlayer(string name);
         [OperationContract(IsOneWay = true)]
         void RemovePlayer(string name);
+        [OperationContract(IsOneWay = true)]
+        void AddCardToPlayer(string name, Card c);
+        [OperationContract(IsOneWay = true)]
+        void RemoveCardFromPlayer(string name, Card c);
         [OperationContract]
         string[] GetAllMessages();
         [OperationContract]
@@ -183,6 +190,23 @@ namespace CardLibrary
             updatePlayers();
         }
 
+        public void AddCardToPlayer(string name, Card c)
+        {
+            if(!cardsOfPlayers.ContainsKey(name))
+            {
+                cardsOfPlayers.Add(name, new List<Card>());
+                cardsOfPlayers[name].Add(c);
+            }
+            else
+                cardsOfPlayers[name].Add(c);
+            updateCards();
+        }
+
+        public void RemoveCardFromPlayer(string name, Card c)
+        {
+            cardsOfPlayers[name].Remove(c);
+            updateCards();
+        }
         public void PostMessage(string message)
         {
             messages.Insert(0, message);
@@ -223,5 +247,13 @@ namespace CardLibrary
             foreach (ICallback cb in callbacks.Values)
                 cb.AddPlayers(players);
         }
-}
+
+        private void updateCards()
+        {
+            Dictionary<string, List<Card>> cards = this.cardsOfPlayers;
+            foreach (ICallback cb in callbacks.Values)
+                cb.UpdateCards(cards);
+        }
+
+    }
 }

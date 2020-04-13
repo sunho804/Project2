@@ -32,6 +32,7 @@ namespace GoFishClient
         private Tuple<string, Tuple<string, string>> askinfo = null;
         private Dictionary<string, int> cardMatches = null;
         private int numPlayers = 0;
+        private Dictionary<string, List<Card>> cardsOfClients = new Dictionary<string, List<Card>>();
 
         //in board, show card count 
 
@@ -80,10 +81,11 @@ namespace GoFishClient
                 {
                     Card card = shoe.Draw();
 
-                    cardListBox.Items.Insert(0, card);
+                    //cardListBox.Items.Insert(0, card);
                     //Console.WriteLine(card);
                     cardMatches[card.Rank.ToString()]++;
                     //shoe.NumCards.ToString();
+                    shoe.AddCardToPlayer(nameTxtBox.Text, card);
                 }
                 
                 findBooks();
@@ -105,9 +107,11 @@ namespace GoFishClient
         {
             try
             {
+                var something = cardsOfClients;
                 //draw 1 card
                 Card card = shoe.Draw();
-                cardListBox.Items.Insert(cardListBox.Items.Count, card);
+                //cardListBox.Items.Insert(cardListBox.Items.Count, card);
+                shoe.AddCardToPlayer(nameTxtBox.Text, card);
                 cardMatches[card.Rank.ToString()]++;
                 findBooks();
                 shoe.PostMessage($"Drawing a card. There is now {cardCount} cards left in the pile.");
@@ -123,16 +127,26 @@ namespace GoFishClient
         private void askBtn_Click(object sender, RoutedEventArgs e)
         {
             shoe.PostMessage(playersAskComboBox.SelectedItem + ", do you have any " + cardsAskComboBox.SelectedItem + "?");
+            
+            if(cardsOfClients.ContainsKey(playersAskComboBox.SelectedItem.ToString()))
+            {
+                List<Card> cardsOfOtherPlayer = cardsOfClients[playersAskComboBox.SelectedItem.ToString()];
+                List<Card> cardsThatWillBePassed = new List<Card>();
 
-            shoe.StoreCard(nameTxtBox.Text, playersAskComboBox.SelectedItem.ToString(), cardsAskComboBox.SelectedItem.ToString());
-            //foreach(Card c in cardListBox.Items)
-            //{
-            //    if(c.Rank.ToString() == cardsAskComboBox.SelectedItem.ToString())
-            //    {
-            //        Card selected = c;
-            //        cardListBox.Items.Remove(c);
-            //    }
-            //}
+                foreach(Card c in cardsOfOtherPlayer)
+                {
+                    if(c.Rank.ToString() == cardsAskComboBox.SelectedItem.ToString())
+                    {
+                        cardsThatWillBePassed.Add(c);
+                    }
+                }
+
+                foreach(Card c in cardsThatWillBePassed)
+                {
+                    shoe.RemoveCardFromPlayer(playersAskComboBox.SelectedItem.ToString(), c);
+                    shoe.AddCardToPlayer(nameTxtBox.Text, c);
+                }
+            }
 
         }
 
@@ -214,6 +228,26 @@ namespace GoFishClient
                 this.Dispatcher.BeginInvoke(new GuiUpdateDelegate(AddPlayers), new object[] { names });
         }
 
+        private delegate void ClientCardUpdateDelegate(Dictionary<string, List<Card>> cards);
+
+        public void UpdateCards(Dictionary<string, List<Card>> cards)
+        {
+            if (this.Dispatcher.Thread == System.Threading.Thread.CurrentThread)
+            {
+                try
+                {
+                    cardListBox.ItemsSource = cards[nameTxtBox.Text];
+                    cardsOfClients = cards;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            else
+                this.Dispatcher.BeginInvoke(new ClientCardUpdateDelegate(UpdateCards), cards);
+        }
+
         private delegate void ClientUpdateDelegate(CallBackInfo info);
 
         public void UpdateGui(CallBackInfo info)
@@ -253,7 +287,7 @@ namespace GoFishClient
                         }
                     }
                     foreach (Card c in cardsdelete)
-                        cardListBox.Items.Remove(c);
+                        shoe.RemoveCardFromPlayer(nameTxtBox.Text, new );
                     shoe.PostMessage($"Four {entry.Key}s have been found!");
                 }
             }
@@ -294,5 +328,6 @@ namespace GoFishClient
                 MessageBox.Show(ex.Message);
             }
         }
+
     }
 }
