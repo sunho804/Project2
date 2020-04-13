@@ -91,9 +91,16 @@ namespace GoFishClient
                 playBtn.IsEnabled = false;
                 shoe.PostMessage($"There is now {cardCount} cards left in the pile.");
 
+                string players = "";
+
                 if (playersListBox.Items.Count == Int32.Parse(numPlayersCombobox.SelectedItem.ToString()))
                 {
                     shoe.PostMessage("Start game!");
+                    //shoe.PostMessage("Order of play is the same as the player list on the top right.");
+                    for (var i = 0; i < playersListBox.Items.Count; i++)
+                        players += playersListBox.Items[i] + " ";
+                    shoe.PostMessage("Order of play : " + players);
+                    shoe.PostMessage(playersListBox.Items[0] + ", You're up first!");
                 }
             }
             catch (Exception ex)
@@ -116,6 +123,11 @@ namespace GoFishClient
                 shoe.PostMessage($"Drawing a card. There is now {cardCount} cards left in the pile.");
                 if (shoe.NumCards == 0)
                     gameOver = true;
+                if (!gotCard)
+                {
+                    shoe.PostMessage($"{nameTxtBox.Text}'s turn is over.");
+                    gotCard = false;
+                }
             }
             catch (Exception ex)
             {
@@ -125,7 +137,7 @@ namespace GoFishClient
 
         private void askBtn_Click(object sender, RoutedEventArgs e)
         {
-            shoe.PostMessage(playersAskComboBox.SelectedItem + ", do you have any " + cardsAskComboBox.SelectedItem + "?");
+            shoe.PostMessage(nameTxtBox.Text + " : " + playersAskComboBox.SelectedItem + ", do you have any " + cardsAskComboBox.SelectedItem + "?");
 
             if (cardsOfClients.ContainsKey(playersAskComboBox.SelectedItem.ToString()))
             {
@@ -157,7 +169,10 @@ namespace GoFishClient
                     if (!gotCard)
                         shoe.PostMessage(playersAskComboBox.SelectedItem + " doesn't have " + cardsAskComboBox.SelectedItem + ". Go fish! Draw card.");
                     else
+                    {
                         shoe.PostMessage(nameTxtBox.Text + "'s turn is over. ");
+                        gotCard = false;
+                    }
                 }
             }
 
@@ -309,6 +324,12 @@ namespace GoFishClient
             for (int i = 0; i < bookListBox.Items.Count; i++)
             {
                 cardMatches[bookListBox.Items[i].ToString()] = 0;
+            }
+
+            if(cardCount == 0)
+            {
+                gameOver = true;
+                shoe.PostMessage(nameTxtBox.Text + " found " + cardMatches.Count + " books!");
             }
 
             return foundbook;

@@ -211,20 +211,20 @@ namespace CardLibrary
                     cardDeleted = card;
             }
             cardsOfPlayers[name].Remove(cardDeleted);
-            List<Card> cards = new List<Card>();
-            foreach (var i in cardsOfPlayers[name])
-            {
-                if (i != c)
-                {
-                    cards.Add(i);
-                }
-            }
-            cardsOfPlayers.Remove(name);
-            cardsOfPlayers.Add(name, new List<Card>());
-            foreach (Card card in cards)
-            {
-                cardsOfPlayers[name].Add(card);
-            }
+            //List<Card> cards = new List<Card>();
+            //foreach (var i in cardsOfPlayers[name])
+            //{
+            //    if (i != c)
+            //    {
+            //        cards.Add(i);
+            //    }
+            //}
+            //cardsOfPlayers.Remove(name);
+            //cardsOfPlayers.Add(name, new List<Card>());
+            //foreach (Card card in cards)
+            //{
+            //    cardsOfPlayers[name].Add(card);
+            //}
 
             updateCards();
         }
