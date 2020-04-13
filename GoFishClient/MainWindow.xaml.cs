@@ -287,7 +287,7 @@ namespace GoFishClient
                         }
                     }
                     foreach (Card c in cardsdelete)
-                        shoe.RemoveCardFromPlayer(nameTxtBox.Text, new );
+                        shoe.RemoveCardFromPlayer(nameTxtBox.Text, c);
                     shoe.PostMessage($"Four {entry.Key}s have been found!");
                 }
             }
