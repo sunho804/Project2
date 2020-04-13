@@ -8,3 +8,13 @@ C:\Users\Sunho\Desktop\2020WINTER\Component.NET\Project\Project2\CardLibrary\obj
 C:\Users\Sunho\Desktop\2020WINTER\Component.NET\Project\Project2\CardLibrary\obj\Debug\CardLibrary.pdb
 C:\Users\Sunho\Desktop\2020WINTER\Component.NET\Project\Project2\CardLibrary\bin\Debug\CardLibrary.dll
 C:\Users\Sunho\Desktop\2020WINTER\Component.NET\Project\Project2\CardLibrary\bin\Debug\CardLibrary.pdb
+C:\5th Semester\.NET\Project2\Project2-master (3)\Project2-master\CardLibrary\bin\Debug\CardLibrary.dll
+C:\5th Semester\.NET\Project2\Project2-master (3)\Project2-master\CardLibrary\bin\Debug\CardLibrary.pdb
+C:\5th Semester\.NET\Project2\Project2-master (3)\Project2-master\CardLibrary\obj\Debug\CardLibrary.csprojAssemblyReference.cache
+C:\5th Semester\.NET\Project2\Project2-master (3)\Project2-master\CardLibrary\obj\Debug\CardLibrary.dll
+C:\5th Semester\.NET\Project2\Project2-master (3)\Project2-master\CardLibrary\obj\Debug\CardLibrary.pdb
+C:\Users\sueko\Downloads\Project2-ask_button\Project2-ask_button\CardLibrary\bin\Debug\CardLibrary.dll
+C:\Users\sueko\Downloads\Project2-ask_button\Project2-ask_button\CardLibrary\bin\Debug\CardLibrary.pdb
+C:\Users\sueko\Downloads\Project2-ask_button\Project2-ask_button\CardLibrary\obj\Debug\CardLibrary.csprojAssemblyReference.cache
+C:\Users\sueko\Downloads\Project2-ask_button\Project2-ask_button\CardLibrary\obj\Debug\CardLibrary.dll
+C:\Users\sueko\Downloads\Project2-ask_button\Project2-ask_button\CardLibrary\obj\Debug\CardLibrary.pdb
