@@ -37,7 +37,6 @@ namespace CardLibrary
         Card Draw();
         int NumCards { [OperationContract] get; }
         int NumPlayers { [OperationContract] get; [OperationContract] set; }
-        Tuple<string, Tuple<string, string>> AskingInfo { [OperationContract] get; }
         [OperationContract]
         bool Join(string name);
         [OperationContract(IsOneWay = true)]
@@ -48,8 +47,6 @@ namespace CardLibrary
         void AddPlayer(string name);
         [OperationContract(IsOneWay = true)]
         void RemovePlayer(string name);
-        [OperationContract(IsOneWay = true)]
-        void StoreCard(string personAsking, string personAsked, string rank);
         [OperationContract]
         string[] GetAllMessages();
         [OperationContract]
@@ -69,9 +66,8 @@ namespace CardLibrary
         private Dictionary<string, ICallback> callbacks = new Dictionary<string, ICallback>();
         private List<string> messages = new List<string>();
         private List<string> players = new List<string>();
-        private Tuple<string, Tuple<string, string>> askInfo = null;
-        private bool asking = false;
         private int numPlayers = 0;
+        private Dictionary<string, List<Card>> cardsOfPlayers = new Dictionary<string, List<Card>>();
 
         public Shoe()
         {
@@ -104,11 +100,6 @@ namespace CardLibrary
             return card;
         }
 
-        public void StoreCard(string personAsking, string personAsked, string rank)
-        {
-            askInfo = new Tuple<string, Tuple<string, string>>(personAsking, new Tuple<string, string>(personAsked, rank));
-            asking = true;
-        }
 
         public int NumCards
         {
@@ -128,14 +119,6 @@ namespace CardLibrary
             {
                 if (numPlayers != value)
                     numPlayers = value;
-            }
-        }
-
-        public Tuple<string, Tuple<string, string>> AskingInfo
-        {
-            get
-            {
-                return askInfo;
             }
         }
 
